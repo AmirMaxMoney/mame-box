@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MemeBox فارسی</title>
+
+<style>
+body {
+  margin:0;
+  background:#111;
+  color:white;
+  font-family:sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  padding:15px;
+}
+.box {
+  background:#1a1a1a;
+  width:100%;
+  max-width:420px;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+  box-shadow:0 0 15px black;
+}
+img {
+  width:100%;
+  border-radius:10px;
+  margin:15px 0;
+  max-height:420px;
+  object-fit:contain;
+}
+button, a {
+  padding:10px 18px;
+  border:none;
+  border-radius:6px;
+  margin:5px;
+  cursor:pointer;
+  font-size:15px;
+}
+#next {
+  background:#4caf50;
+  color:white;
+}
+#download {
+  background:#2196f3;
+  color:white;
+  text-decoration:none;
+  display:inline-block;
+}
+</style>
+</head>
+
+<body>
+<div class="box">
+  <h2>😂 میم‌باکس فارسی</h2>
+  <img id="memePic" src="">
+  <br>
+  <button id="next" onclick="nextMeme()">میم بعدی</button>
+  <a id="download" download="MemeBox.jpg" href="#">دانلود میم</a>
+</div>
+
+<script>
+// لیست میم‌های فارسی (بعداً هرچی خواستی اضافه می‌کنیم)
+const memes = [
+  "https://s6.uupload.ir/files/1_j8m2.jpg",
+  "https://s6.uupload.ir/files/2_hk9q.jpg",
+  "https://s6.uupload.ir/files/3_c3jx.jpg",
+  "https://s6.uupload.ir/files/4_1z4m.jpg",
+  "https://s6.uupload.ir/files/5_f8vv.jpg",
+  "https://s6.uupload.ir/files/6_3t9n.jpg",
+  "https://s6.uupload.ir/files/7_az0r.jpg",
+  "https://s6.uupload.ir/files/8_wl2q.jpg"
+];
+
+function nextMeme(){
+  let m = memes[Math.floor(Math.random()*memes.length)];
+  document.getElementById("memePic").src = m;
+  document.getElementById("download").href = m;
+}
+
+// بارگذاری اولین میم
+nextMeme();
+</script>
+
+</body>
+</html>
