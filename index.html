@@ -33,7 +33,7 @@ img {
   max-height:420px;
   object-fit:contain;
 }
-button, a {
+button {
   padding:10px 18px;
   border:none;
   border-radius:6px;
@@ -41,31 +41,78 @@ button, a {
   cursor:pointer;
   font-size:15px;
 }
-#next {
-  background:#4caf50;
-  color:white;
+#next { background:#4caf50; color:white; }
+#adminBtn { background:#f44336; color:white; }
+
+#adminPanel {
+  display:none;
+  background:#222;
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
 }
-#download {
-  background:#2196f3;
-  color:white;
-  text-decoration:none;
-  display:inline-block;
+input {
+  width:100%;
+  padding:8px;
+  margin:5px 0;
+  border-radius:6px;
+  border:none;
 }
+#memeList {
+  max-height:140px;
+  overflow:auto;
+  background:#111;
+  padding:8px;
+  border-radius:6px;
+  text-align:right;
+}
+.memeItem {
+  display:flex;
+  justify-content:space-between;
+  background:#333;
+  padding:6px;
+  border-radius:5px;
+  margin:4px 0;
+  font-size:13px;
+}
+.memeItem button {
+  background:#ff1744;
+  padding:4px 8px;
+  font-size:12px;
+  border-radius:4px;
+  border:none;
+  cursor:pointer;
+}
+.smallNote { font-size:12px;color:#bbb;margin-top:8px }
+@media(max-width:420px){ .box{padding:14px} img{max-height:320px} }
 </style>
 </head>
 
 <body>
 <div class="box">
   <h2>😂 میم‌باکس فارسی</h2>
-  <img id="memePic" src="">
+  <img id="memePic" src="" alt="میم">
   <br>
   <button id="next" onclick="nextMeme()">میم بعدی</button>
-  <a id="download" download="MemeBox.jpg" href="#">دانلود میم</a>
+  <button id="adminBtn" onclick="openAdmin()">ورود ادمین</button>
+
+  <!-- پنل ادمین -->
+  <div id="adminPanel" aria-hidden="true">
+    <h3 style="margin-top:10px">پنل مدیریت</h3>
+    <input id="newMemeUrl" placeholder="لینک میم جدید را وارد کن">
+    <button onclick="addMeme()">➕ اضافه کردن</button>
+
+    <h4 style="margin-top:12px">لیست میم‌ها:</h4>
+    <div id="memeList"></div>
+  </div>
 </div>
 
 <script>
-// لیست میم‌های فارسی (بعداً هرچی خواستی اضافه می‌کنیم)
-const memes = [
+// رمز مدیریت (در صورت نیاز تغییرش بده)
+const ADMIN_PASS = "admin123";
+
+// بارگذاری میم‌ها از LocalStorage یا مقدار پیشفرض
+let memes = JSON.parse(localStorage.getItem("memes")) || [
   "https://s6.uupload.ir/files/images_(6)_fw5i.jpeg",
   "https://s6.uupload.ir/files/1665644779_ihw3.jpg",
   "https://s6.uupload.ir/files/images_(5)_230t.jpeg",
@@ -77,15 +124,68 @@ const memes = [
   "https://s6.uupload.ir/files/images_(4)_kh4h.jpeg"
 ];
 
-function nextMeme(){
-  let m = memes[Math.floor(Math.random()*memes.length)];
-  document.getElementById("memePic").src = m;
-  document.getElementById("download").href = m;
+function saveMemes(){
+  localStorage.setItem("memes", JSON.stringify(memes));
+  loadList();
 }
 
-// بارگذاری اولین میم
+function nextMeme(){
+  if(!memes || memes.length === 0){
+    document.getElementById("memePic").src = "";
+    return;
+  }
+  const m = memes[Math.floor(Math.random()*memes.length)];
+  document.getElementById("memePic").src = m;
+}
+
+function openAdmin(){
+  const pass = prompt("رمز ادمین رو وارد کن:");
+  if(pass === ADMIN_PASS){
+    const panel = document.getElementById("adminPanel");
+    panel.style.display = "block";
+    panel.setAttribute("aria-hidden","false");
+    loadList();
+  } else {
+    alert("رمز اشتباهه.");
+  }
+}
+
+function addMeme(){
+  const url = document.getElementById("newMemeUrl").value.trim();
+  if(!url) { alert("آدرس وارد نشده"); return; }
+  // جلوگیری از تکراری شدن دقیق
+  if(memes.includes(url)) { alert("این لینک قبلاً اضافه شده"); document.getElementById("newMemeUrl").value = ""; return; }
+  memes.push(url);
+  document.getElementById("newMemeUrl").value = "";
+  saveMemes();
+  alert("میم اضافه شد.");
+}
+
+function deleteMeme(index){
+  if(!confirm("آیا مطمئنی می‌خوای این لینک حذف بشه؟")) return;
+  memes.splice(index,1);
+  saveMemes();
+}
+
+function loadList(){
+  const list = document.getElementById("memeList");
+  list.innerHTML = "";
+  if(!memes || memes.length === 0){
+    list.innerHTML = "<div style='color:#999'>لیست خالی است.</div>";
+    return;
+  }
+  memes.forEach((m, i) => {
+    const short = m.length > 48 ? m.slice(0,45) + "..." : m;
+    const div = document.createElement("div");
+    div.className = "memeItem";
+    div.innerHTML = `<div style="text-align:left;direction:ltr;overflow:hidden;white-space:nowrap">${short}</div>
+                     <button onclick="deleteMeme(${i})">حذف</button>`;
+    list.appendChild(div);
+  });
+}
+
+// شروع اولیه
 nextMeme();
 </script>
-
 </body>
 </html>
